@@ -1,0 +1,27 @@
+# Core RAG
+sentence-transformers>=2.6.0   # BGE-M3 embeddings
+chromadb>=0.5.0                 # Vector store
+langchain>=0.2.0
+langchain-community>=0.2.0
+
+# LLM (choose one or more)
+google-generativeai>=0.7.0      # Gemini API
+groq>=0.9.0                     # Groq (Llama/Mistral fast inference)
+
+# Interface
+streamlit>=1.35.0
+streamlit-chat>=0.1.1
+
+# Data processing
+pdfplumber>=0.11.0              # PDF text extraction
+pymupdf>=1.24.0                 # Fitz - fallback PDF reader
+pandas>=2.0.0
+tqdm>=4.66.0
+
+# Evaluation
+ragas>=0.1.0                    # RAG evaluation metrics
+datasets>=2.19.0
+
+# Utils
+python-dotenv>=1.0.0
+loguru>=0.7.0
