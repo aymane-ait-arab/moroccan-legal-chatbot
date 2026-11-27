@@ -5,7 +5,7 @@ A bilingual (FR/AR) RAG-powered chatbot for Moroccan law, covering:
 - 👨‍👩‍👧 **Moudawana** (Dahir 1-04-22) — 399 FR + 397 AR articles
 - ⚖️ **Dahir des Obligations et Contrats (DOC)** — 1 240 FR + 1 239 AR articles
 
-> **Total indexé : 4 025 articles** prêts pour la recherche vectorielle.
+> **Total : 4 025 articles parsés et prêts pour l'indexation vectorielle.**
 
 ---
 
@@ -32,15 +32,15 @@ Réponse avec source officielle
 | Étape | Statut | Détails |
 |-------|--------|---------|
 | Structure du projet | ✅ Done | Dossiers, Git, GitHub |
-| Collecte des données | ✅ Done | 6 PDFs/DOC officiels |
+| Collecte des données | ✅ Done | 6 PDFs/DOC officiels (FR + AR) |
 | Parsing des articles | ✅ Done | Parser v3, regex FR + AR |
 | Nettoyage JSON | ✅ Done | 4 025 articles propres |
-| Indexation ChromaDB | 🔄 À faire | BGE-M3 embeddings |
-| Guardrails (refus) | 🔄 À faire | Détecteur hors périmètre |
-| RAG Pipeline | 🔄 À faire | Retrieve + Generate |
-| Interface Streamlit | 🔄 À faire | Chat + Dashboard |
-| Jeu d'évaluation | 🔄 À faire | 40 questions benchmark |
-| Métriques RAG | 🔄 À faire | Recall@3, Fidélité, Refus |
+| Indexation ChromaDB | 🔄 En cours | BGE-M3 embeddings — **Duo 1** |
+| Guardrails (refus) | 🔄 En cours | Détecteur hors périmètre — **Duo 1** |
+| RAG Pipeline | 🔄 En cours | Retrieve + Generate — **Duo 1** |
+| Interface Streamlit | 🔄 En cours | Chat + Dashboard — **Duo 2** |
+| Jeu d'évaluation | 🔄 En cours | 40 questions benchmark — **Duo 2** |
+| Métriques RAG | 🔄 En cours | Recall@3, Fidélité, Refus — **Duo 2** |
 
 ---
 
@@ -49,35 +49,36 @@ Réponse avec source officielle
 ```
 moroccan-legal-chatbot/
 ├── data/
-│   ├── raw/                    # PDFs officiels (non versionnés)
-│   │   ├── code_travail/       # code_du_travail_fr.pdf + ar.pdf
-│   │   ├── moudawana/          # moudawana_fr.pdf + ar.pdf
-│   │   └── doc/                # doc_fr.pdf + doc_ar.doc
-│   ├── processed/              # ✅ 6 fichiers JSON (4 025 articles)
+│   ├── raw/                      # PDFs officiels (non versionnés)
+│   │   ├── code_travail/
+│   │   ├── moudawana/
+│   │   └── doc/
+│   ├── processed/                # ✅ 6 fichiers JSON — 4 025 articles
 │   │   ├── code_travail_fr.json  (586 articles)
 │   │   ├── code_travail_ar.json  (164 articles)
 │   │   ├── moudawana_fr.json     (399 articles)
 │   │   ├── moudawana_ar.json     (397 articles)
 │   │   ├── doc_fr.json           (1 240 articles)
 │   │   └── doc_ar.json           (1 239 articles)
-│   └── vectorstore/            # ChromaDB (non versionné)
+│   └── vectorstore/              # ChromaDB (non versionné)
 ├── src/
 │   ├── parsing/
-│   │   └── parser.py           # ✅ Regex FR + AR, nettoyage, dédup
+│   │   └── parser.py             # ✅ Parser v3 — regex FR + AR
 │   ├── embedding/
-│   │   └── indexer.py          # 🔄 BGE-M3 → ChromaDB
+│   │   └── indexer.py            # 🔄 BGE-M3 → ChromaDB [Duo 1]
 │   ├── rag/
-│   │   └── pipeline.py         # 🔄 Retrieve + Generate
+│   │   └── pipeline.py           # 🔄 Retrieve + Generate [Duo 1]
 │   └── guardrails/
-│       └── detector.py         # 🔄 Détection hors périmètre
+│       └── detector.py           # 🔄 Refus hors périmètre [Duo 1]
 ├── app/
-│   ├── main.py                 # 🔄 Streamlit entry point
+│   ├── main.py                   # 🔄 Streamlit entry point [Duo 2]
 │   └── pages/
-│       ├── chat.py             # 🔄 Interface chat bilingue
-│       └── dashboard.py        # 🔄 Métriques d'évaluation
+│       ├── chat.py               # 🔄 Interface chat bilingue [Duo 2]
+│       └── dashboard.py          # 🔄 Métriques d'évaluation [Duo 2]
 ├── evaluation/
-│   ├── questions/              # 🔄 40 questions benchmark
-│   └── results/                # 🔄 Résultats évaluation
+│   ├── questions/
+│   │   └── benchmark.json        # 🔄 40 questions [Duo 2]
+│   └── run_benchmark.py          # 🔄 Script métriques [Duo 2]
 ├── tests/
 ├── requirements.txt
 ├── .env.example
@@ -114,40 +115,113 @@ streamlit run app/main.py
 
 ---
 
-## 🌿 Stratégie Git (4 personnes)
+## 👥 Organisation — 2 Duos
 
-| Branche | Rôle |
-|---------|------|
-| `main` | Code stable — merge uniquement via PR validée |
-| `develop` | Branche d'intégration |
-| `feature/indexation` | Dev 1 — ChromaDB + BGE-M3 |
-| `feature/rag-pipeline` | Dev 2 — Pipeline RAG + Guardrails |
-| `feature/streamlit-ui` | Dev 3 — Interface Streamlit |
-| `feature/evaluation` | Dev 4 — Benchmark 40 questions |
+### 🔵 Duo 1 — Backend · branche `feature/backend`
 
-**Workflow :**
+| Développeur | Module | Fichiers |
+|-------------|--------|---------|
+| Dev A | Indexation ChromaDB + BGE-M3 | `src/embedding/indexer.py` |
+| Dev B | RAG Pipeline + Guardrails | `src/rag/pipeline.py`, `src/guardrails/detector.py` |
+
+### 🟣 Duo 2 — Frontend · branche `feature/frontend`
+
+| Développeur | Module | Fichiers |
+|-------------|--------|---------|
+| Dev C | Interface Streamlit | `app/pages/chat.py`, `app/pages/dashboard.py` |
+| Dev D | Évaluation & Benchmark | `evaluation/questions/benchmark.json`, `evaluation/run_benchmark.py` |
+
+---
+
+## 🌿 Git — Instructions par duo
+
+### 🔵 Duo 1 — Premier arrivé crée la branche
+
 ```bash
-# Chaque dev travaille sur sa branche
-git checkout -b feature/ma-feature develop
+# Dev A — créer et pousser la branche
+git clone https://github.com/aymane-ait-arab/moroccan-legal-chatbot.git
+cd moroccan-legal-chatbot
+git checkout develop
+git checkout -b feature/backend
+git push -u origin feature/backend
 
-# Commit régulier
+# Dev B — rejoindre la branche
+git clone https://github.com/aymane-ait-arab/moroccan-legal-chatbot.git
+cd moroccan-legal-chatbot
+git fetch origin
+git checkout feature/backend
+```
+
+```bash
+# Workflow quotidien — les deux membres
+git pull origin feature/backend    # récupérer le travail de l'autre
+# ... coder ...
 git add .
 git commit -m "feat: description claire"
-git push origin feature/ma-feature
+git push origin feature/backend
+```
 
-# Pull Request → develop → review → merge
+### 🟣 Duo 2 — Même logique
+
+```bash
+# Dev C — créer et pousser la branche
+git clone https://github.com/aymane-ait-arab/moroccan-legal-chatbot.git
+cd moroccan-legal-chatbot
+git checkout develop
+git checkout -b feature/frontend
+git push -u origin feature/frontend
+
+# Dev D — rejoindre la branche
+git clone https://github.com/aymane-ait-arab/moroccan-legal-chatbot.git
+cd moroccan-legal-chatbot
+git fetch origin
+git checkout feature/frontend
+```
+
+```bash
+# Workflow quotidien — les deux membres
+git pull origin feature/frontend   # récupérer le travail de l'autre
+# ... coder ...
+git add .
+git commit -m "feat: description claire"
+git push origin feature/frontend
+```
+
+### 🔀 Merger dans develop (quand un module est terminé)
+
+```bash
+git checkout develop
+git pull origin develop
+git merge feature/backend          # ou feature/frontend
+git push origin develop
 ```
 
 ---
 
-## 👥 Répartition des tâches (4 personnes)
+## 📅 Timeline
 
-| Personne | Module | Fichiers principaux |
-|----------|--------|-------------------|
-| Dev 1 | Indexation | `src/embedding/indexer.py` |
-| Dev 2 | RAG + Guardrails | `src/rag/pipeline.py`, `src/guardrails/detector.py` |
-| Dev 3 | Interface | `app/pages/chat.py`, `app/pages/dashboard.py` |
-| Dev 4 | Évaluation | `evaluation/questions/`, métriques |
+| Semaine | 🔵 Duo 1 (Backend) | 🟣 Duo 2 (Frontend) |
+|---------|-------------------|-------------------|
+| **S1** | Indexation ChromaDB | Design UI + Dataset 40 questions |
+| **S2** | RAG Pipeline + Guardrails | Intégration pipeline dans UI |
+| **S3** | Tests + merge develop | Dashboard métriques + merge develop |
+| **S4** | Tests finaux + corrections | Présentation finale |
+
+---
+
+## ⚠️ Règles Git pour tout le monde
+
+- ❌ **Ne jamais pusher directement sur `main`**
+- ✅ Toujours `git pull` avant de commencer à coder
+- ✅ Commits clairs : `feat:` / `fix:` / `docs:` / `test:`
+- ✅ En cas de conflit : ouvrir le fichier, chercher `<<<<<<<`, garder le bon code, puis `git add . && git commit`
+
+---
+
+## 🔑 Accès collaborateurs
+
+Le propriétaire du repo doit ajouter les 3 autres via :
+> **GitHub → Settings → Collaborators → Add people**
 
 ---
 
